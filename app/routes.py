@@ -16,6 +16,19 @@ from flask import Blueprint, jsonify, abort, make_response, request
 
 books_bp = Blueprint("books", __name__, url_prefix = "/books")
 
+def validate_book(book_id):
+    try:
+        book_id = int(book_id)
+    except:
+        abort(make_response({"message":f"book {book_id} invalid"}, 400))
+
+    book = Book.query.get(book_id)
+    
+    if not book:
+        abort(make_response({"message":f"book {book_id} not found"}, 404))
+    
+    return book
+
 @books_bp.route("", methods = ["GET"])
 def handle_books():
     books = Book.query.all()
@@ -28,6 +41,17 @@ def handle_books():
         })
     return jsonify(books_response)
 
+@books_bp.route("/<book_id>", methods = ["GET"])
+def get_one_book(book_id):
+    book = validate_book(book_id)
+    book_dict = {
+        "id": book.id,
+        "title": book.title,
+        "description": book.description
+
+    }
+    return jsonify(book_dict)
+
 @books_bp.route("", methods = ["POST"])
 def create_book():
     request_body = request.get_json()
@@ -37,35 +61,19 @@ def create_book():
 
     return make_response(f"Book {new_book.title} successfully created", 201)
 
-# @books_bp.route("", methods = ["GET"])
-# def handle_books():
-#     books_response = []
-#     for book in books:
-#         books_response.append({
-#             "id": book.id,
-#             "title": book.title,
-#             "description": book.description
-#         })
-#     return jsonify(books_response)
+@books_bp.route("/<book_id>", methods = ["PUT"])
+def update_book(book_id):
+    book = validate_book(book_id)
 
-# def validate_book(book_id):
-#     try:
-#         book_id = int(book_id)
-#     except:
-#         abort(make_response({"message":f"book {book_id} invalid"}, 400))
+    request_body = request.get_json()
 
-#     for book in books:
-#         if book.id == book_id:
-#             return book
+    book.title = request_body["title"]
+    book.description = request_body["description"]
 
-#     abort(make_response({"message":f"book {book_id} not found"}, 404))
+    db.session.commit()
 
-# @books_bp.route("/<book_id>", methods = ["GET"])
-# def handle_book(book_id):
-#     book = validate_book(book_id)
-#     return {
-#         "id": book.id,
-#         "title": book.title,
-#         "description": book.description
-#         }
+    return make_response(f"Book {book_id} successfully updated.", 200)
+
+
+
 
