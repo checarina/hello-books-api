@@ -2,18 +2,6 @@ from app import db
 from app.models.book import Book 
 from flask import Blueprint, jsonify, abort, make_response, request
 
-# class Book:
-#     def __init__(self, id, title, description):
-#         self.id = id
-#         self.title = title
-#         self.description = description
-
-# books = [
-#     Book(1, "Pride and Prejudice", "my favorite"),
-#     Book(2, "The Two Towers", "the beacons are lit, Gondor calls for aid"),
-#     Book(3, "The Life-Changing Magic of Tidying Up", "sparks joy")
-# ] 
-
 books_bp = Blueprint("books", __name__, url_prefix = "/books")
 
 def validate_book(book_id):
