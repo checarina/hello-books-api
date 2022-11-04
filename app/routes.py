@@ -27,23 +27,13 @@ def get_all_books():
 
     books_response = []
     for book in books:
-        books_response.append({
-            "id": book.id,
-            "title": book.title,
-            "description": book.description
-        })
+        books_response.append(book.to_dict())
     return jsonify(books_response)
 
 @books_bp.route("/<book_id>", methods = ["GET"])
 def get_one_book(book_id):
     book = validate_book(book_id)
-    book_dict = {
-        "id": book.id,
-        "title": book.title,
-        "description": book.description
-
-    }
-    return jsonify(book_dict)
+    return book.to_dict()
 
 @books_bp.route("", methods = ["POST"])
 def create_book():
